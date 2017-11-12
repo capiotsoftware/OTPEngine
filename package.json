@@ -1,0 +1,18 @@
+{
+  "name": "UnicornOTP",
+  "version": "1.0.0",
+  "description": "OTP Engine, for the Unicorns!",
+  "main": "app.js",
+  "dependencies": {
+    "bignum": "^0.11.0",
+    "chai": "^3.4.1",
+    "express": "4.13.3",
+    "mocha": "^2.3.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Abilash Mohan",
+  "license": "Propietary"
+}
