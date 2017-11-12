@@ -1,0 +1,149 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: UnicornOTP
+# during dev, should point to your local machine
+host: localhost:10099
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+
+  "/{channel}":
+    x-swagger-router-controller: otp_main
+    post:
+      description: Create an OTP
+      operationId: createOTP
+      parameters:
+        - name: channel
+          in: path
+          type: string
+          description: The channel on which OTP needs to be generated.
+        - name: returnOTP
+          in: query
+          type: boolean
+          description: Define if the OTP needs to retruned to the caller
+        - name: outbound
+          in: query
+          type: boolean
+          description: Send to a pre-defined outbound URL
+        - name: token
+          in: query
+          type: string
+          description: API Token for the channel
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            $ref: "#/definitions/CreateOTPResponse"
+        default:
+          description: Failure response
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  "/{channel}/{context}":
+    x-swagger-router-controller: otp_main
+    put:
+      description: Validate the generated OTP.
+      operationId: validateOTP
+      parameters:
+        - name: channel
+          in: path
+          type: string
+        - name: context
+          in: path
+          type: string
+          description: The context of the OTP vaidation.
+        - name: otp
+          in: query
+          type: string
+          description: The OTP to be validated
+        - name: token
+          in: query
+          type: string
+          description: Channel Token.
+      responses:
+        "200":
+          description: "OTP Validation is successful"
+        "400":
+          description: "OTP Validation failed, Invalid channel / token / context"
+    delete:
+      description: Deletes / cancels an on-going OTP
+      operationId: deleteOTP
+      parameters:
+        - name: channel
+          in: path
+          type: string
+          description: Channel ID
+        - name: context
+          in: path
+          type: string
+          description: Context ID
+        - name: token
+          in: query
+          type: string
+          description: token ID.
+      responses:
+        "200":
+          description: successfully deleted the context
+        "400":
+          description: Invalid context ID / channel / token.
+          
+  /hello:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: hello_world
+    get:
+      description: Returns 'Hello' to the caller
+      # used as the method name of the controller
+      operationId: hello
+      parameters:
+        - name: name
+          in: query
+          description: The name of the person to whom to say hello
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/HelloWorldResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  CreateOTPResponse:
+    properties:
+      otp:
+        type: string
+        description: OTP generated
+      context:
+        type: string
+        description: context id of the generated OTP. You need this context when cross validating the OTP.
+  
+  HelloWorldResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
